@@ -1,11 +1,13 @@
-GLOBAL seven
+GLOBAL _start
+EXTERN main
 
 section .text
 
-seven:
+_start:
     push ebp
     mov ebp,esp
-    mov eax,7
+    call main
     mov esp,ebp
     pop ebp
-    ret
+    mov eax,1
+    int 80h 

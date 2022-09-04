@@ -1,8 +1,9 @@
 #include <stdio.h>
 
-int siete(void);
+int seven();
 
 int main(void){
-    printf("%d\n",siete());
+    int number=seven();
+    printf("%d\n",number);
     return 0;
 }

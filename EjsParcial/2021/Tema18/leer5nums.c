@@ -1,63 +1,79 @@
-#include <string.h>
 #include <stdio.h>
-#define SIZE (5*5+4)
+#include <stdlib.h> 
+#include <string.h>
 
-#define GCERR -2               // Error del getchar
-#define EOF -1                 // End of file
-#define STDIN  0               // FD Standard input
-#define STDOUT 1               // FD Standard output
-#define STDERR 2               // FD Standard error
+// sys_open permisos con los que abro el archivo
+// flags
+#define _O_RDONLY   0x000 // Read only
+#define _O_WRONLY   0x001 // Write only
+#define _O_RDWR     0x002 // Read & Write
+#define _O_CREAT    0x040 // Create
+#define _O_TRUNC    0x200 // Para reescribir el archivo
+#define _O_APPEND   0x400 // Append
 
-// flags para sys_open
-#define _O_RDONLY 0x0000       // Read only
-#define _O_WRONLY 0x0001       // Write only
-#define _O_RDWR   0x0002       // Read & Write
-#define _O_CREAT  0x0040       // Create
+// sys_open permisos con los que se crea el archivo
+// mode
+#define S_IXUSR 0100 // USER exec perm
+#define S_IWUSR 0200 // USER write perm
+#define S_IRUSR 0400 // USER read perm
+#define S_IRWXU 0700 // USER read write exec perm 
 
-// flags de permisos sys_open
-#define S_IXUSR 00100          // owner, execute permission
-#define S_IWUSR 00200          // owner, write permission
-#define S_IRUSR 00400          // owner, read permission
-#define S_IRWX  00700          // owner, read, write, execute permission
+int sys_read(int fd, void * buffer, int bytes);
+int sys_write(int fd, void * buffer, int bytes);
+int sys_open(const char * path, int flags, int mode);
+int sys_close(int fd);
+void function(int args_qty, char * args[]);
 
-extern int sys_write(int fd, void *buffer, int size);
-extern int sys_exit(int error);
-extern int sys_read(int fd, void *buf, int count);
-extern int sys_open(const char *pathname, int flags, int mode);
-extern int sys_close(int fd);
+
+int compareNumbers(char a[],char b[])  
+{  
+    int flag=1,i=0;  
+    while(i<5 && flag==1)  
+    {  
+       if(a[i]!=b[i])  
+       {  
+           flag=0;   
+       }  
+       i++;  
+    }  
+    if(flag==1){  
+        return 1;  
+    }
+    return 0;  
+}  
+
 
 int main(void){
-    int fdA = sys_open("DatosA.txt", _O_RDONLY, 0);
-    if(fdA < 0){
-        char errmsg[] = "Error, no se pudo abrir el archivo A\n";
-        sys_write(STDERR, errmsg , strlen(errmsg));
-        sys_exit(fdA);
-    }
-    int fdB = sys_open("DatosB.txt",_O_RDONLY, 0);
-    if(fdB < 0){
-        char errmsg[] = "Error, no se pudo abrir el archivo B\n";
-        sys_write(STDERR, errmsg , strlen(errmsg));
-        sys_exit(fdA);
-    }
-    int fdC = sys_open("DatosC.txt",_O_CREAT|_O_RDWR, S_IRWX);
-    if(fdC < 0){
-        char errmsg[] = "Error, no se pudo crear el archivo C\n";
-        sys_write(STDERR, errmsg , strlen(errmsg));
-        sys_exit(fdA);
-    }
-    char bufferA[SIZE];
-    char bufferB[SIZE];
-    sys_read(fdA,bufferA,SIZE);
-    sys_read(fdA,bufferB,SIZE);
 
-    for (int i=0;i<SIZE;i++){
-        printf("caca");
-        if(bufferA[i]==bufferB[i]){   
-                sys_write(fdC,bufferA[i],1);
+    int fdA = sys_open( "DatosA.txt" , 0x000 , 0 );
+    int fdB = sys_open( "DatosB.txt" , 0x000 , 0 );
+
+    char bufferA[5][5];
+    char bufferB[5][5];
+    char basura;
+
+    for( int i=0 ; i<5 ; i++ ){
+        sys_read( fdA , bufferA[i] , 5 );
+        sys_read( fdA , &basura , 1 );
+    }
+    for( int i=0 ; i<5 ; i++ ){
+        sys_read( fdB , bufferB[i] , 5 );
+        sys_read( fdB , &basura , 1 );
+    }    
+
+    int fdC = sys_open( "DatosC.txt" , _O_CREAT | _O_RDWR , S_IRWXU );
+
+    for( int i=0 ; i<5 ; i++ ){
+        for( int j=0 ; j<5 ; j++ ){
+            if( compareNumbers( bufferA[i] , bufferB[j] ) == 1 ){
+                sys_write( fdC , bufferA[i] , 5 );
+                sys_write( fdC , "\n" , 1 );
+                j = 5;
             }
+        }
     }
     sys_close(fdA);
-    sys_close(fdB);
     sys_close(fdC);
-    return 0;
+    sys_close(fdC);
 }
+

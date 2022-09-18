@@ -1,7 +1,7 @@
 EXTERN main
 GLOBAL _start
 
-section .text:
+section .text
 _start:
     push ebp
     mov ebp,esp

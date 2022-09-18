@@ -1,43 +1,75 @@
+#include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
-#define GCERR -2               // Error del getchar
-#define EOF -1                 // End of file
-#define STDIN  0               // FD Standard input
-#define STDOUT 1               // FD Standard output
-#define STDERR 2               // FD Standard error
+double pow(double base, double exp);
+int sys_write(int file_descriptor, char * str, int len);
 
-// flags para sys_open
-#define _O_RDONLY 0x0000       // Read only
-#define _O_WRONLY 0x0001       // Write only
-#define _O_RDWR   0x0002       // Read & Write
-#define _O_CREAT  0x0040       // Create
-
-// flags de permisos sys_open
-#define S_IXUSR 00100          // owner, execute permission
-#define S_IWUSR 00200          // owner, write permission
-#define S_IRUSR 00400          // owner, read permission
-#define S_IRWX  00700          // owner, read, write, execute permission
-
-extern int sys_write(int fd, void *buffer, int size);
-extern int sys_exit(int error);
-extern int sys_read(int fd, void *buf, int count);
-extern int sys_open(const char *pathname, int flags, int mode);
-extern int sys_close(int fd);
-
+int strlen(char * str);
 double str_to_double(char str[]);
 void double_to_str(double num, char * ans);
-int promedio(int argc, char *argv[]);
-len_int_part(int num);
+int len_int_part(int num);
 
-int promedio(int argc, char *argv[]){
-    double sum;
-    char resp[32]={0};
-    for(int i=1;i<argc;i++){
-        sum+=str_to_double(argv[i]);
+int main(int argc, char * argv[]){
+    double a = str_to_double(argv[1]);
+    double b = str_to_double(argv[2]);
+    double c = str_to_double(argv[3]);
+
+    // Test pasaje de str a double
+    // printf("A: %f\n", a);
+    // printf("B: %f\n", b);
+    // printf("C: %f\n", c);
+
+    // Test pasaje de double a string
+    // double num = 123.4567;
+    // char str_num[256];
+    // double_to_str(num, str_num);
+    // printf("String %s\n", str_num);
+
+    double discriminant = ((b * b) - (4 * a * c));
+    double root1, root2;
+
+    if(discriminant > 0) {
+        root1 = (-b + sqrt(discriminant)) / (2 * a);
+        root2 = (-b - sqrt(discriminant)) / (2 * a);
+        char str_root1[256];
+        char str_root2[256];
+        double_to_str(root1, str_root1);
+        double_to_str(root2, str_root2);
+        sys_write(1, "Raiz 1 = ", strlen("Raiz 1 = "));
+        sys_write(1, str_root1, strlen(str_root1));
+        sys_write(1, "\n", 1);
+        sys_write(1, "Raiz 2 = ", strlen("Raiz 2 = "));
+        sys_write(1, str_root2, strlen(str_root2));
+        sys_write(1, "\n", 1);
+    }else if(discriminant == 0) {
+        root1 = -b / (2 * a);
+        char str_root1[256];
+        double_to_str(root1, str_root1);
+        sys_write(1, "Raiz 1 = Raiz 2 = ", strlen("Raiz 1 = Raiz 2 = "));
+        sys_write(1, str_root1, strlen(str_root1));
+        sys_write(1, "\n", 1);
+    }else if(discriminant < 0){
+        double realPart = -b / (2 * a);
+        double imagPart = sqrt(-discriminant) / (2 * a);
+        char str_realPart[256];
+        char str_imagPart[256];
+        double_to_str(realPart, str_realPart);
+        double_to_str(imagPart, str_imagPart);
+        sys_write(1, "Raiz 1 = ", strlen("Raiz 1 = "));
+        sys_write(1, str_realPart, strlen(str_realPart));
+        sys_write(1, " + ", strlen(" + "));
+        sys_write(1, str_imagPart, strlen(str_imagPart));
+        sys_write(1, "i", strlen("i"));
+        sys_write(1, "\n", 1);
+
+        sys_write(1, "Raiz 2 = ", strlen("Raiz 2 = "));
+        sys_write(1, str_realPart, strlen(str_realPart));
+        sys_write(1, " - ", strlen(" + "));
+        sys_write(1, str_imagPart, strlen(str_imagPart));
+        sys_write(1, "i", strlen("i"));
+        sys_write(1, "\n", 1);
     }
-    double_to_str(sum/(argc-1), resp);
-    sys_write(1,resp,32);
-    return 0;
 }
 
 double str_to_double(char str[]){
@@ -132,7 +164,6 @@ void double_to_str(double num, char * ans){
     if(neg)
         ans[0]='-';
 }
-   
 
 int len_int_part(int num){
     if(num == 0){
@@ -142,6 +173,22 @@ int len_int_part(int num){
     while(num != 0){
         i++;
         num = num/10;
+    }
+    return i;
+}
+
+double pow(double base, double exp){
+    double ans = base;
+    for(int i = 0; i < (exp-1); i++){
+        ans *= ans;
+    }
+    return ans;
+}
+
+int strlen(char * str){
+    int i = 0;
+    while(str[i] != 0){
+        i++;
     }
     return i;
 }

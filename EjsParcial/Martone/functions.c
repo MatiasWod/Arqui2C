@@ -433,3 +433,11 @@ int getClockInterval(long * sec, long * nanosec) {
     (*nanosec) = (long)((timePassed - (*sec)) / nanosecExp);
     return 1;
 }
+
+double pow(double base, double exp){
+    double ans = base;
+    for(int i = 0; i < (exp-1); i++){
+        ans *= ans;
+    }
+    return ans;
+}

@@ -1,0 +1,12 @@
+Primero, compilamos el archivo assembler con NASM
+nasm -f elf32 numeros_primos.asm
+
+Luego, compilamos el archivo C junto al codigo objeto generado previamente con gcc
+gcc -m32 numeros_primos.o ej_parcial.c -o a -lm
+
+Finalmente, probamos el ejercicio corriendo
+./a
+
+Si corremos, por ejemplo
+./a
+y luego ingresamos el valor 5 cuando se nos pide, veremos que nos devuelve 10, que es la suma de los primos hasta el 5 inclusive.

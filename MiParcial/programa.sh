@@ -1,4 +1,3 @@
 #!/bin/bash
-nasm -f elf32 binary_search.asm
-gcc -m32 binary_search.o binary_search.c -o binary_search
-
+nasm -f elf32 bubble_sort.asm
+gcc -m32 bubble_sort.o main.c -o main
